@@ -32,6 +32,7 @@ const server = net.createServer((socket: any) => {
             }
         } else if (path.startsWith('/files/')) {
             const directory = process.argv[2]; // Corrected to argv[2]
+            console.log('Directory:', directory); // Debugging line
             const fileName = path.replace('/files/', '');
             console.log('File Name:', fileName); // Debugging line
 

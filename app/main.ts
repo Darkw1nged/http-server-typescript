@@ -19,7 +19,7 @@ const server = net.createServer((socket: any) => {
             const directory = process.argv[3];
             const fileName = query;
 
-            fs.readFile(directory + fileName, 'utf8', (err: Error, data: string) => {
+            fs.readFileSync(directory + fileName, 'utf8', (err: Error, data: string) => {
                 if (err) {
                     socket.write('HTTP/1.1 404 Not Found\r\n\r\n');
                 }

@@ -26,16 +26,16 @@ This TypeScript application implements a simple HTTP server that supports handli
    - Ensure TypeScript is installed globally or locally (`npm install -g typescript` or `npm install typescript`).
 
 3. **Build**:
-   - Navigate to the project directory containing `yourServerFile.ts`.
+   - Navigate to the project directory containing `main.ts`.
    - Compile TypeScript files to JavaScript using:
      ```bash
-     tsc yourServerFile.ts
+     tsc main.ts
      ```
 
 4. **Execution**:
-   - Execute the compiled JavaScript file (`yourServerFile.js`) with the following command:
+   - Execute the compiled JavaScript file (`main.js`) with the following command:
      ```bash
-     node yourServerFile.js --directory /path/to/your/directory
+     node main.js --directory /path/to/your/directory
      ```
      Replace `/path/to/your/directory` with the absolute path where you want the server to save files.
 

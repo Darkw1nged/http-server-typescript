@@ -31,12 +31,12 @@ const server = net.createServer((socket: any) => {
                 socket.write('HTTP/1.1 400 Bad Request\r\n\r\n');
             }
         } else if (path.startsWith('/files/')) {
-            const directory = process.argv[2]; // Corrected to argv[2]
+            const directory = process.argv[3]; // Corrected to argv[2]
             console.log('Directory:', directory); // Debugging line
             const fileName = path.replace('/files/', '');
             console.log('File Name:', fileName); // Debugging line
 
-            fs.readFile(`/files/${fileName}`, 'utf8', (err: Error, fileData: string) => {
+            fs.readFile(`${directory}/${fileName}`, 'utf8', (err: Error, fileData: string) => {
                 if (err) {
                     console.error('File Read Error:', err); // Debugging line
                     socket.write('HTTP/1.1 404 Not Found\r\n\r\n');

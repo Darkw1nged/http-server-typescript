@@ -23,8 +23,6 @@ const server = net.createServer((socket: any) => {
             console.log('[debug] ' + fileName);
 
             fs.readFile(directory + fileName, 'utf8', (err: Error, data: string) => {
-                console.log('[debug] ' + data);
-
                 if (err) {
                     socket.write('HTTP/1.1 404 Not Found\r\n\r\n');
                 }

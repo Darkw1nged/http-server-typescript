@@ -8,8 +8,8 @@ const server = net.createServer((socket: any) => {
         const path = request.split(" ")[1];
         const query = path.split("/")[2];
 
-        console.log(path);
-        console.log(query);
+        // console.log(path);
+        // console.log(query);
 
         if (path === '/') {
             socket.write('HTTP/1.1 200 OK\r\n\r\n');
@@ -22,8 +22,8 @@ const server = net.createServer((socket: any) => {
             const directory = process.argv[3];
             const fileName = query;
 
-            console.log(directory);
-            console.log(fileName);
+            console.log('[debug]' + directory);
+            console.log('[debug]' + fileName);
 
             fs.readFile(`${directory}${fileName}`, 'utf8', (err: Error, data: string) => {
                 if (err) {

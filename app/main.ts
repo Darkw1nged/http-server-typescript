@@ -1,5 +1,5 @@
 import * as net from "net";
-import * as fs from "fs";
+import fs from "node:fs";
 
 const server = net.createServer((socket: any) => {
     socket.on("data", (data: any) => {

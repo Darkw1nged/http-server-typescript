@@ -6,10 +6,9 @@ const server = net.createServer((socket: any) => {
     socket.on("data", (data: any) => {
         const request = data.toString();
         const path = request.split(" ")[1];
+        path.shift();
 
-        console.log(path.split("/"));
-
-        const query = path.split("/")[2];
+        const query = path.split("/")[1];
 
         if (path === '/') {
             socket.write('HTTP/1.1 200 OK\r\n\r\n');
@@ -18,9 +17,9 @@ const server = net.createServer((socket: any) => {
         } else if (path === '/user-agent') {
             const userAgent = request.split('User-Agent: ')[1].split('\r\n')[0];
             socket.write(`HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${userAgent.length}\r\n\r\n${userAgent}`);
-        } else if (path.split('/')[1] === 'files') {
+        } else if (path[0] === 'files') {
             const directory = process.argv[3];
-            const fileName = query;
+            const fileName = path[1];
 
             fs.readFile(directory + fileName, 'utf8', (err: Error, fileData: string) => {
                 if (err) {

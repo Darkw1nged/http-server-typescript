@@ -8,16 +8,13 @@ const server = net.createServer((socket: any) => {
         const request = data.toString();
         console.log('Request:', request);
         const [requestLine, ...headerLines] = request.split('\r\n');
-        const [method, path] = request.split(' ');
+        const [method, path] = requestLine.split(' ');
 
         if (!path) {
             socket.write('HTTP/1.1 400 Bad Request\r\n\r\n');
             socket.end();
             return;
         }
-
-        const query = path.split("/")[2];
-        console.log('Query:', query);
 
         const headers: { [key: string]: string } = {};
         for (const headerLine of headerLines) {
@@ -26,11 +23,20 @@ const server = net.createServer((socket: any) => {
             headers[key] = value;
         }
 
+        const acceptEncoding = headers['Accept-Encoding'] || '';
+        const supportsGzip = acceptEncoding.includes('gzip');
+
         if (method === 'GET') {
             if (path === '/') {
                 socket.write('HTTP/1.1 200 OK\r\n\r\n');
             } else if (path.startsWith('/echo/')) {
-                socket.write(`HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${query.length}\r\n\r\n${query}`);
+                const query = path.split("/")[2];
+                let response = `HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${query.length}\r\n`;
+                if (supportsGzip) {
+                    response += 'Content-Encoding: gzip\r\n';
+                }
+                response += `\r\n${query}`;
+                socket.write(response);
             } else if (path === '/user-agent') {
                 const userAgent = headers['User-Agent'];
                 if (userAgent) {
@@ -49,7 +55,12 @@ const server = net.createServer((socket: any) => {
                         console.error('File Read Error:', err);
                         socket.write('HTTP/1.1 404 Not Found\r\n\r\n');
                     } else {
-                        socket.write(`HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: ${Buffer.byteLength(fileData)}\r\n\r\n${fileData}`);
+                        let response = `HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: ${Buffer.byteLength(fileData)}\r\n`;
+                        if (supportsGzip) {
+                            response += 'Content-Encoding: gzip\r\n';
+                        }
+                        response += `\r\n${fileData}`;
+                        socket.write(response);
                     }
                     socket.end();
                 });
@@ -73,9 +84,9 @@ const server = net.createServer((socket: any) => {
                 } else {
                     socket.write('HTTP/1.1 201 Created\r\n\r\n');
                 }
-                socket.end(); // Ensure the socket is ended after response is sent
+                socket.end();
             });
-            return; // Return early to avoid ending the socket prematurely
+            return;
         } else {
             socket.write('HTTP/1.1 405 Method Not Allowed\r\n\r\n');
         }

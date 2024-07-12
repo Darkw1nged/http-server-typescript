@@ -15,7 +15,7 @@ const server = net.createServer((socket: any) => {
         } else if (path === '/user-agent') {
             const userAgent = request.split('User-Agent: ')[1].split('\r\n')[0];
             socket.write(`HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${userAgent.length}\r\n\r\n${userAgent}`);
-        } else if (path === `/files/`) {
+        } else if (path === `/files`) {
             const directory = process.argv[3];
             const fileName = query;
 

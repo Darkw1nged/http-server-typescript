@@ -1,6 +1,7 @@
 import * as net from "net";
 import * as fs from "fs";
 import * as process from "process";
+import * as zlib from "zlib";
 import { Buffer } from "buffer";
 
 const server = net.createServer((socket: any) => {
@@ -26,17 +27,34 @@ const server = net.createServer((socket: any) => {
         const acceptEncoding = headers['Accept-Encoding'] || '';
         const supportsGzip = acceptEncoding.includes('gzip');
 
+        const sendResponse = (statusCode: string, contentType: string, body: string | Buffer, isGzip: boolean = false) => {
+            let response = `HTTP/1.1 ${statusCode}\r\nContent-Type: ${contentType}\r\n`;
+            if (isGzip) {
+                response += 'Content-Encoding: gzip\r\n';
+            }
+            response += `Content-Length: ${Buffer.byteLength(body)}\r\n\r\n`;
+            socket.write(response);
+            socket.write(body);
+            socket.end();
+        };
+
         if (method === 'GET') {
             if (path === '/') {
                 socket.write('HTTP/1.1 200 OK\r\n\r\n');
             } else if (path.startsWith('/echo/')) {
                 const query = path.split("/")[2];
-                let response = `HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${query.length}\r\n`;
                 if (supportsGzip) {
-                    response += 'Content-Encoding: gzip\r\n';
+                    zlib.gzip(query, (err: Error, compressed: any) => {
+                        if (err) {
+                            socket.write('HTTP/1.1 500 Internal Server Error\r\n\r\n');
+                            socket.end();
+                            return;
+                        }
+                        sendResponse('200 OK', 'text/plain', compressed, true);
+                    });
+                } else {
+                    sendResponse('200 OK', 'text/plain', query);
                 }
-                response += `\r\n${query}`;
-                socket.write(response);
             } else if (path === '/user-agent') {
                 const userAgent = headers['User-Agent'];
                 if (userAgent) {
@@ -55,14 +73,19 @@ const server = net.createServer((socket: any) => {
                         console.error('File Read Error:', err);
                         socket.write('HTTP/1.1 404 Not Found\r\n\r\n');
                     } else {
-                        let response = `HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: ${Buffer.byteLength(fileData)}\r\n`;
                         if (supportsGzip) {
-                            response += 'Content-Encoding: gzip\r\n';
+                            zlib.gzip(fileData, (err: Error, compressed: any) => {
+                                if (err) {
+                                    socket.write('HTTP/1.1 500 Internal Server Error\r\n\r\n');
+                                    socket.end();
+                                    return;
+                                }
+                                sendResponse('200 OK', 'application/octet-stream', compressed, true);
+                            });
+                        } else {
+                            sendResponse('200 OK', 'application/octet-stream', fileData);
                         }
-                        response += `\r\n${fileData}`;
-                        socket.write(response);
                     }
-                    socket.end();
                 });
                 return;
             } else {

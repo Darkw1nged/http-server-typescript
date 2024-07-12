@@ -28,6 +28,7 @@ const server = net.createServer((socket: any) => {
                 }
                 console.log('[debug] ' + data);
                 console.log('[debug] ' + data.length);
+                console.log('[debug] ' + `HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: ${data.length}\r\n\r\n${data}`)
 
                 socket.write(`HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: ${data.length}\r\n\r\n${data}`);
             });

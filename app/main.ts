@@ -6,7 +6,6 @@ const server = net.createServer((socket: any) => {
     socket.on("data", (data: any) => {
         const request = data.toString();
         const path = request.split(" ")[1];
-        path.shift();
 
         const query = path.split("/")[1];
 
@@ -27,7 +26,7 @@ const server = net.createServer((socket: any) => {
                 }
                 socket.write(`HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: ${fileData.length}\r\n\r\n${fileData}`);
             })
-
+            socket.end();
         }
 
 

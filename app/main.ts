@@ -8,6 +8,9 @@ const server = net.createServer((socket: any) => {
         const path = request.split(" ")[1];
         const query = path.split("/")[2];
 
+        printf(path);
+        printf(query);
+
         if (path === '/') {
             socket.write('HTTP/1.1 200 OK\r\n\r\n');
         } else if (path === `/echo/${query}`) {

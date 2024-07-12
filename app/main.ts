@@ -5,6 +5,9 @@ import * as process from "process";
 const server = net.createServer((socket: any) => {
     socket.on("data", (data: any) => {
         const request = data.toString();
+
+        console.log(request);
+
         const path = request.split(" ")[1];
         const query = path.split("/")[2];
 

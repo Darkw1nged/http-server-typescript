@@ -8,13 +8,6 @@ const server = net.createServer((socket: any) => {
         const path = request.split(" ")[1];
         const query = path.split("/")[2];
 
-        console.log(path.split('/'));
-        // console.log(query);
-
-        console.log('[debug]' + (path.split('/')[0] === '/files/'))
-        console.log('[debug]' + (path.split('/')[0] === '/files'))
-        console.log('[debug]' + (path.split('/')[0] === 'files'))
-
         if (path === '/') {
             socket.write('HTTP/1.1 200 OK\r\n\r\n');
         } else if (path === `/echo/${query}`) {
@@ -26,14 +19,14 @@ const server = net.createServer((socket: any) => {
             const directory = process.argv[3];
             const fileName = query;
 
-            console.log('[debug]' + directory);
-            console.log('[debug]' + fileName);
+            console.log('[debug] ' + directory);
+            console.log('[debug] ' + fileName);
 
-            fs.readFile(`${directory}${fileName}`, 'utf8', (err: Error, data: string) => {
+            fs.readFile(directory + fileName, 'utf8', (err: Error, data: string) => {
                 if (err) {
                     socket.write('HTTP/1.1 404 Not Found\r\n\r\n');
                 }
-                socket.write(`HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${data.length}\r\n\r\n${data}`);
+                socket.write(`HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: ${data.length}\r\n\r\n${data}`);
             });
 
         }

@@ -8,13 +8,6 @@ const server = net.createServer((socket: any) => {
         const path = request.split(" ")[1];
         const query = path.split("/")[2];
 
-        console.log(path);
-        // console.log(query);
-
-        console.log('[debug]' + (path === '/files/'))
-        console.log('[debug]' + (path === '/files'))
-        console.log('[debug]' + (path === 'files'))
-
         if (path === '/') {
             socket.write('HTTP/1.1 200 OK\r\n\r\n');
         } else if (path === `/echo/${query}`) {
@@ -22,7 +15,7 @@ const server = net.createServer((socket: any) => {
         } else if (path === '/user-agent') {
             const userAgent = request.split('User-Agent: ')[1].split('\r\n')[0];
             socket.write(`HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${userAgent.length}\r\n\r\n${userAgent}`);
-        } else if (path === '/files/') {
+        } else if (path.split('/')[0] === 'files') {
             const directory = process.argv[3];
             const fileName = query;
 

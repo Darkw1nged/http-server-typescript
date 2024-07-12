@@ -8,8 +8,12 @@ const server = net.createServer((socket: any) => {
         const path = request.split(" ")[1];
         const query = path.split("/")[2];
 
-        // console.log(path);
+        console.log(path);
         // console.log(query);
+
+        console.log('[debug]' + (path === '/files/'))
+        console.log('[debug]' + (path === '/files'))
+        console.log('[debug]' + (path === 'files'))
 
         if (path === '/') {
             socket.write('HTTP/1.1 200 OK\r\n\r\n');

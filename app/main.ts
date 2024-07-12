@@ -27,7 +27,6 @@ const server = net.createServer((socket: any) => {
         const acceptEncoding = headers['Accept-Encoding'] || '';
         const supportsGzip = acceptEncoding.includes('gzip');
 
-
         if (method === 'GET') {
             if (path === '/') {
                 socket.write('HTTP/1.1 200 OK\r\n\r\n');
@@ -36,14 +35,17 @@ const server = net.createServer((socket: any) => {
                 const responseHeaders = `HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n`;
 
                 if (supportsGzip) {
-                    zlib.gzip(query, (err: Error, compressed: any) => {
+                    zlib.gzip(query, (err, compressed) => {
                         if (err) {
+                            console.error('Gzip Error:', err);
                             socket.write('HTTP/1.1 500 Internal Server Error\r\n\r\n');
+                            socket.end();
                         } else {
+                            console.log('Compressed Data:', compressed);
                             socket.write(`${responseHeaders}Content-Encoding: gzip\r\nContent-Length: ${compressed.length}\r\n\r\n`);
                             socket.write(compressed);
+                            socket.end();
                         }
-                        socket.end();
                     });
                 } else {
                     socket.write(`${responseHeaders}Content-Length: ${query.length}\r\n\r\n${query}`);
@@ -56,6 +58,7 @@ const server = net.createServer((socket: any) => {
                 } else {
                     socket.write('HTTP/1.1 400 Bad Request\r\n\r\n');
                 }
+                socket.end();
             } else if (path.startsWith('/files/')) {
                 const directory = process.argv[3];
                 console.log('Directory:', directory);
@@ -70,8 +73,9 @@ const server = net.createServer((socket: any) => {
                         const responseHeaders = `HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\n`;
 
                         if (supportsGzip) {
-                            zlib.gzip(fileData, (err: Error, compressed: any) => {
+                            zlib.gzip(fileData, (err, compressed) => {
                                 if (err) {
+                                    console.error('Gzip Error:', err);
                                     socket.write('HTTP/1.1 500 Internal Server Error\r\n\r\n');
                                 } else {
                                     socket.write(`${responseHeaders}Content-Encoding: gzip\r\nContent-Length: ${compressed.length}\r\n\r\n`);
@@ -88,6 +92,7 @@ const server = net.createServer((socket: any) => {
                 return;
             } else {
                 socket.write('HTTP/1.1 404 Not Found\r\n\r\n');
+                socket.end();
             }
         } else if (method === 'POST' && path.startsWith('/files/')) {
             const directory = process.argv[3];
@@ -110,9 +115,8 @@ const server = net.createServer((socket: any) => {
             return;
         } else {
             socket.write('HTTP/1.1 405 Method Not Allowed\r\n\r\n');
+            socket.end();
         }
-
-        socket.end();
     });
 });
 

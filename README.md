@@ -1,38 +1,68 @@
-[![progress-banner](https://backend.codecrafters.io/progress/http-server/d7c96455-03df-46be-8ea5-3bd6aa00881f)](https://app.codecrafters.io/users/codecrafters-bot?r=2qF)
+# HTTP Server with Gzip Compression
 
-This is a starting point for TypeScript solutions to the
-["Build Your Own HTTP server" Challenge](https://app.codecrafters.io/courses/http-server/overview).
+This TypeScript application implements a simple HTTP server that supports handling GET and POST requests with gzip compression for certain endpoints. It's designed to serve basic file operations and echo functionalities while optionally compressing responses with gzip based on client preferences.
 
-[HTTP](https://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol) is the
-protocol that powers the web. In this challenge, you'll build a HTTP/1.1 server
-that is capable of serving multiple clients.
+## Features
 
-Along the way you'll learn about TCP servers,
-[HTTP request syntax](https://www.w3.org/Protocols/rfc2616/rfc2616-sec5.html),
-and more.
+- **GET Requests**:
+  - Handles `/echo/{str}`: Returns the provided `{str}` as plain text. Optionally compresses the response using gzip if the client requests it (`Accept-Encoding: gzip` header).
+  - `/user-agent`: Returns the User-Agent header of the request.
 
-**Note**: If you're viewing this repo on GitHub, head over to
-[codecrafters.io](https://codecrafters.io) to try the challenge.
+- **POST Requests**:
+  - Handles `/files/{filename}`: Saves the POST body content as a file named `{filename}` in a specified directory (provided during execution).
 
-# Passing the first stage
+- **Error Handling**:
+  - Properly responds with appropriate HTTP status codes and error messages for bad requests, file not found, internal server errors, and unsupported HTTP methods.
 
-The entry point for your HTTP server implementation is in `app/main.ts`. Study
-and uncomment the relevant code, and push your changes to pass the first stage:
+- **Gzip Compression**:
+  - Supports gzip compression based on the `Accept-Encoding` header in GET request responses and appropriately sets the `Content-Encoding` header.
 
-```sh
-git add .
-git commit -m "pass 1st stage" # any msg
-git push origin master
-```
+## Usage
 
-Time to move on to the next stage!
+1. **Setup**:
+   - Clone this repository or download the source code files.
 
-# Stage 2 & beyond
+2. **Dependencies**:
+   - Ensure TypeScript is installed globally or locally (`npm install -g typescript` or `npm install typescript`).
 
-Note: This section is for stages 2 and beyond.
+3. **Build**:
+   - Navigate to the project directory containing `yourServerFile.ts`.
+   - Compile TypeScript files to JavaScript using:
+     ```bash
+     tsc yourServerFile.ts
+     ```
 
-1. Ensure you have `bun (1.1)` installed locally
-1. Run `./your_server.sh` to run your program, which is implemented in
-   `app/main.ts`.
-1. Commit your changes and run `git push origin master` to submit your solution
-   to CodeCrafters. Test output will be streamed to your terminal.
+4. **Execution**:
+   - Execute the compiled JavaScript file (`yourServerFile.js`) with the following command:
+     ```bash
+     node yourServerFile.js --directory /path/to/your/directory
+     ```
+     Replace `/path/to/your/directory` with the absolute path where you want the server to save files.
+
+5. **Testing**:
+   - Use a tool like `curl` to send GET and POST requests to test various endpoints.
+   - Example GET request with gzip compression:
+     ```bash
+     curl -v -H "Accept-Encoding: gzip" http://localhost:4221/echo/abc
+     ```
+   - Example POST request to create a file:
+     ```bash
+     curl -v -X POST -d "File content" http://localhost:4221/files/newFile.txt
+     ```
+
+6. **Additional Notes**:
+   - Ensure the server has appropriate permissions to read from and write to the specified directory.
+   - This server currently supports gzip compression as specified. Future extensions may include additional compression methods based on client preferences (`Accept-Encoding` header).
+
+## Considerations
+
+- **Security**:
+  - Implement additional security measures for handling user input and file operations in a production environment.
+  - Validate input data and sanitize paths to prevent directory traversal attacks.
+
+- **Performance**:
+  - Evaluate performance implications of gzip compression, especially for large files and high-traffic servers.
+  - Consider implementing caching mechanisms for improved performance.
+
+- **Compatibility**:
+  - Test with various client applications and browsers to ensure compatibility with different HTTP headers and methods.

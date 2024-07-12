@@ -5,7 +5,7 @@ const server = net.createServer((socket: any) => {
         const request = data.toString();
         const path = request.split(" ")[1];
 
-        if (path === '/echo/') {
+        if (path === '/echo') {
             const echo = request.split(" ")[2];
             const res = `HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${echo.length}\r\n\r\n${echo}`;
             socket.write(res);
